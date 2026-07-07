@@ -260,7 +260,7 @@ fn compute_view_internal(
                 app.tab_scroll,
                 app.tab_scroll_follow_active,
                 app.mouse_capture,
-                app.index_numbers,
+                app.tab_index_numbers,
             )
         })
         .unwrap_or_default();

@@ -288,8 +288,14 @@ impl App {
                         SettingsAction::SaveAgentBorderLabels(enabled) => {
                             self.save_agent_border_labels(enabled)
                         }
-                        SettingsAction::SaveIndexNumbers(enabled) => {
-                            self.save_index_numbers(enabled)
+                        SettingsAction::SaveSpaceIndexNumbers(enabled) => {
+                            self.save_space_index_numbers(enabled)
+                        }
+                        SettingsAction::SaveTabIndexNumbers(enabled) => {
+                            self.save_tab_index_numbers(enabled)
+                        }
+                        SettingsAction::SaveAgentIndexNumbers(enabled) => {
+                            self.save_agent_index_numbers(enabled)
                         }
                         SettingsAction::SavePaneHistory(enabled) => {
                             self.save_pane_history_persistence(enabled)

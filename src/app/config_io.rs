@@ -92,9 +92,25 @@ impl App {
         }
     }
 
-    pub(super) fn save_index_numbers(&mut self, enabled: bool) {
-        if self.update_config_file("index numbers", |content| {
-            crate::config::upsert_section_bool(content, "ui", "index_numbers", enabled)
+    pub(super) fn save_space_index_numbers(&mut self, enabled: bool) {
+        if self.update_config_file("space index numbers", |content| {
+            crate::config::upsert_section_bool(content, "ui", "space_index_numbers", enabled)
+        }) {
+            self.apply_config_from_disk(false);
+        }
+    }
+
+    pub(super) fn save_tab_index_numbers(&mut self, enabled: bool) {
+        if self.update_config_file("tab index numbers", |content| {
+            crate::config::upsert_section_bool(content, "ui", "tab_index_numbers", enabled)
+        }) {
+            self.apply_config_from_disk(false);
+        }
+    }
+
+    pub(super) fn save_agent_index_numbers(&mut self, enabled: bool) {
+        if self.update_config_file("agent index numbers", |content| {
+            crate::config::upsert_section_bool(content, "ui", "agent_index_numbers", enabled)
         }) {
             self.apply_config_from_disk(false);
         }

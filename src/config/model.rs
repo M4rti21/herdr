@@ -806,8 +806,12 @@ pub struct UiConfig {
     pub show_agent_labels_on_pane_borders: bool,
     /// Hide the tab row when the workspace has one tab. Default: false.
     pub hide_tab_bar_when_single_tab: bool,
-    /// Show index numbers for workspaces and tabs to visually match 1..9 keybinds. Default: false.
-    pub index_numbers: bool,
+    /// Show index numbers for spaces to visually match 1..9 keybinds. Default: false.
+    pub space_index_numbers: bool,
+    /// Show index numbers for tabs to visually match 1..9 keybinds. Default: false.
+    pub tab_index_numbers: bool,
+    /// Show index numbers for agents to visually match 1..9 keybinds. Default: false.
+    pub agent_index_numbers: bool,
     /// Agent sidebar ordering. Saved values are "spaces" or "priority". Default: "spaces".
     pub agent_panel_sort: AgentPanelSortConfig,
     /// Accent color for highlights, borders, and navigation UI.
@@ -1001,7 +1005,9 @@ impl Default for UiConfig {
             pane_gaps: true,
             show_agent_labels_on_pane_borders: false,
             hide_tab_bar_when_single_tab: false,
-            index_numbers: false,
+            space_index_numbers: false,
+            tab_index_numbers: false,
+            agent_index_numbers: false,
             agent_panel_sort: AgentPanelSortConfig::Spaces,
             accent: "cyan".into(),
             toast: ToastConfig::default(),

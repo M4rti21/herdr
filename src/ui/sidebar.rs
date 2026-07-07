@@ -847,7 +847,7 @@ fn render_workspace_list(
     let scrollbar_rect = workspace_list_scrollbar_rect(app, area);
     let cards = &app.view.workspace_card_areas;
 
-    let ws_position: std::collections::HashMap<usize, usize> = if app.index_numbers {
+    let ws_position: std::collections::HashMap<usize, usize> = if app.space_index_numbers {
         app.visible_workspace_order()
             .into_iter()
             .enumerate()
@@ -917,7 +917,7 @@ fn render_workspace_list(
         } else {
             line1.push(Span::styled(" ", Style::default()));
         }
-        if app.index_numbers {
+        if app.space_index_numbers {
             let num_style = if selected {
                 Style::default().fg(p.overlay1)
             } else if is_active {
@@ -926,7 +926,7 @@ fn render_workspace_list(
                 Style::default().fg(p.overlay0)
             };
             if let Some(pos) = ws_position.get(&i) {
-                line1.push(Span::styled(format!("{}", pos + 1), num_style));
+                line1.push(Span::styled(format!("{})", pos + 1), num_style));
                 line1.push(Span::styled(" ", Style::default()));
             }
         }
@@ -1085,7 +1085,8 @@ fn render_agent_detail(
 
     let mut row_y = body.y;
     let body_bottom = body.y + body.height;
-    for detail in details.iter().skip(app.agent_panel_scroll) {
+    for abs_idx in app.agent_panel_scroll..details.len() {
+        let detail = &details[abs_idx];
         if row_y.saturating_add(1) >= body_bottom {
             break;
         }
@@ -1107,6 +1108,12 @@ fn render_agent_detail(
             Style::default()
         };
 
+        let num_style = if is_active {
+            Style::default().fg(p.text)
+        } else {
+            Style::default().fg(p.overlay0)
+        };
+
         let name_style = if is_active {
             Style::default().fg(p.text).add_modifier(Modifier::BOLD)
         } else {
@@ -1121,12 +1128,15 @@ fn render_agent_detail(
 
         let primary_label =
             format_agent_panel_primary_label(detail, body.width.saturating_sub(3) as usize);
-        let name_line = Line::from(vec![
-            Span::styled(" ", Style::default()),
-            Span::styled(icon, icon_style),
-            Span::styled(" ", Style::default()),
-            Span::styled(primary_label, name_style),
-        ]);
+        let mut name_spans = vec![Span::styled(" ", Style::default())];
+        if app.agent_index_numbers {
+            name_spans.push(Span::styled(format!("{})", abs_idx + 1), num_style));
+            name_spans.push(Span::styled(" ", Style::default()));
+        }
+        name_spans.push(Span::styled(icon, icon_style));
+        name_spans.push(Span::styled(" ", Style::default()));
+        name_spans.push(Span::styled(primary_label, name_style));
+        let name_line = Line::from(name_spans);
         frame.render_widget(
             Paragraph::new(name_line).style(row_style),
             Rect::new(body.x, row_y, body.width, 1),

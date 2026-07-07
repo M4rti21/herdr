@@ -29,23 +29,22 @@ fn tab_width(ws: &crate::workspace::Workspace, tab_idx: usize, show_index: bool)
 }
 
 fn tab_chrome_label(ws: &crate::workspace::Workspace, tab_idx: usize, show_index: bool) -> String {
-    let name = ws
-        .tab_display_name(tab_idx)
-        .unwrap_or_else(|| (tab_idx + 1).to_string());
-    let with_zoom = if ws.tabs.get(tab_idx).is_some_and(|tab| tab.zoomed) {
-        format!("{name} Z")
+    let has_custom_name = ws
+        .tabs
+        .get(tab_idx)
+        .is_some_and(|tab| tab.custom_name.is_some());
+    let display = if show_index && has_custom_name {
+        let name = ws.tab_display_name(tab_idx).unwrap_or_default();
+        format!("{}) {name}", tab_idx + 1)
+    } else if show_index {
+        format!("{})", tab_idx + 1)
     } else {
-        name
+        ws.tab_display_name(tab_idx).unwrap_or_else(|| (tab_idx + 1).to_string())
     };
-    if show_index
-        && ws
-            .tabs
-            .get(tab_idx)
-            .is_some_and(|tab| tab.custom_name.is_some())
-    {
-        format!("{} \u{b7} {with_zoom}", tab_idx + 1)
+    if ws.tabs.get(tab_idx).is_some_and(|tab| tab.zoomed) {
+        format!("{display} Z")
     } else {
-        with_zoom
+        display
     }
 }
 
@@ -353,7 +352,7 @@ pub(super) fn render_tab_bar(app: &AppState, frame: &mut Frame, area: Rect) {
             Style::default().fg(p.overlay1).bg(p.surface0)
         };
         let width = rect.width as usize;
-        let name = tab_chrome_label(ws, idx, app.index_numbers);
+        let name = tab_chrome_label(ws, idx, app.tab_index_numbers);
         let text = format!(" {:width$}", name, width = width.saturating_sub(1));
         frame.render_widget(Paragraph::new(text).style(style), rect);
     }
@@ -434,7 +433,7 @@ mod tests {
 
         app.workspaces = vec![ws];
         app.active = Some(0);
-        app.index_numbers = true;
+        app.tab_index_numbers = true;
         app.view.tab_bar_rect = Rect::new(0, 0, 30, 1);
         let view = compute_tab_bar_view(
             &app.workspaces[0],
@@ -453,8 +452,8 @@ mod tests {
             .unwrap();
 
         let row = buffer_row_text(terminal.backend().buffer(), app.view.tab_bar_rect, 0);
-        assert!(row.contains(" 1 Z"), "tab row: {row:?}");
-        assert!(row.contains("2 · test Z"), "tab row: {row:?}");
+        assert!(row.contains("1) Z"), "tab row: {row:?}");
+        assert!(row.contains("2) test Z"), "tab row: {row:?}");
         assert_eq!(app.workspaces[0].tab_display_name(0).as_deref(), Some("1"));
         assert_eq!(
             app.workspaces[0].tab_display_name(custom_tab).as_deref(),
@@ -510,7 +509,7 @@ mod tests {
 
         assert_eq!(
             tab_width(&ws, 0, true),
-            display_width_u16("1 · 提交 herdr 的反馈") + 4
+            display_width_u16("1) 提交 herdr 的反馈") + 4
         );
     }
 

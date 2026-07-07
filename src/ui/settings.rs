@@ -8,7 +8,8 @@ use ratatui::{
 
 use super::widgets::{
     action_button_row_rects, centered_popup_rect, modal_stack_areas, panel_contrast_fg,
-    render_action_button, render_modal_choice_list, render_panel_shell, ActionButtonSpec,
+    render_action_button, render_modal_choice_list, render_modal_description, render_panel_shell,
+    ActionButtonSpec,
 };
 use crate::{
     app::{
@@ -139,8 +140,12 @@ pub(super) fn render_settings_overlay(app: &AppState, frame: &mut Frame, area: R
             );
         }
         SettingsSection::PaneLabels => {
-            let [top, bottom] = Layout::vertical([Constraint::Length(6), Constraint::Min(6)])
-                .areas::<2>(content_area);
+            let [top, _, bottom] = Layout::vertical([
+                Constraint::Length(6),
+                Constraint::Length(1),
+                Constraint::Min(5),
+            ])
+            .areas::<3>(content_area);
             render_settings_toggle(
                 frame,
                 top,
@@ -154,19 +159,42 @@ pub(super) fn render_settings_overlay(app: &AppState, frame: &mut Frame, area: R
                     2
                 },
             );
-            render_settings_toggle(
+            let [desc_area, _, list_area] = Layout::vertical([
+                Constraint::Length(2),
+                Constraint::Length(1),
+                Constraint::Min(3),
+            ])
+            .areas::<3>(bottom);
+            render_modal_description(
                 frame,
-                bottom,
-                p,
-                "index numbers",
-                "show workspace and tab index for 1..9 keybinds",
-                app.index_numbers_enabled(),
-                if app.settings.list.selected >= 2 {
-                    app.settings.list.selected - 2
-                } else {
-                    2
-                },
+                desc_area,
+                "show index numbers for 1..9 keybinds",
+                Style::default().fg(p.overlay1),
             );
+            for (idx, (label, enabled)) in [
+                ("space numbers", app.space_index_numbers_enabled()),
+                ("tab numbers", app.tab_index_numbers_enabled()),
+                ("agent numbers", app.agent_index_numbers_enabled()),
+            ]
+            .into_iter()
+            .enumerate()
+            {
+                let list_idx = idx + 1;
+                let marker = if enabled { "[✓]" } else { "[ ]" };
+                let style = if app.settings.list.selected == list_idx {
+                    Style::default()
+                        .bg(p.surface0)
+                        .fg(p.text)
+                        .add_modifier(Modifier::BOLD)
+                } else {
+                    Style::default().fg(p.subtext0)
+                };
+                let row = Rect::new(list_area.x, list_area.y + idx as u16, list_area.width, 1);
+                frame.render_widget(
+                    Paragraph::new(format!(" {} {marker}", label)).style(style),
+                    row,
+                );
+            }
         }
         SettingsSection::Experiments => {
             render_settings_experiments(app, frame, content_area);
