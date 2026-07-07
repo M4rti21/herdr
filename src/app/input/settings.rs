@@ -17,6 +17,7 @@ pub(super) enum SettingsAction {
     SaveSound(bool),
     SaveToastDelivery(ToastDelivery),
     SaveAgentBorderLabels(bool),
+    SaveIndexNumbers(bool),
     SavePaneHistory(bool),
     SaveSwitchAsciiInputSourceInPrefix(bool),
     InstallRecommendedIntegrations,
@@ -47,6 +48,7 @@ impl App {
                 SettingsAction::SaveAgentBorderLabels(enabled) => {
                     self.save_agent_border_labels(enabled)
                 }
+                SettingsAction::SaveIndexNumbers(enabled) => self.save_index_numbers(enabled),
                 SettingsAction::SavePaneHistory(enabled) => {
                     self.save_pane_history_persistence(enabled)
                 }
@@ -228,12 +230,19 @@ pub(super) fn update_settings_state(state: &mut AppState, key: KeyEvent) -> Opti
             }
         },
         SettingsSection::PaneLabels => match key.code {
-            KeyCode::Up | KeyCode::Char('k') | KeyCode::Down | KeyCode::Char('j') => {
-                state.settings.list.selected = 1 - state.settings.list.selected.min(1);
+            KeyCode::Up | KeyCode::Char('k') => {
+                state.settings.list.selected = state.settings.list.selected.saturating_sub(1);
+            }
+            KeyCode::Down | KeyCode::Char('j') => {
+                state.settings.list.selected = (state.settings.list.selected + 1).min(3);
             }
             KeyCode::Enter | KeyCode::Char(' ') => {
-                let enabled = state.settings.list.selected == 0;
-                return Some(SettingsAction::SaveAgentBorderLabels(enabled));
+                let enabled = state.settings.list.selected % 2 == 0;
+                return Some(if state.settings.list.selected < 2 {
+                    SettingsAction::SaveAgentBorderLabels(enabled)
+                } else {
+                    SettingsAction::SaveIndexNumbers(enabled)
+                });
             }
             KeyCode::BackTab | KeyCode::Left | KeyCode::Char('h') => {
                 state.settings.section = SettingsSection::Toast;
@@ -311,7 +320,13 @@ pub(crate) fn open_settings_at(state: &mut AppState, section: SettingsSection) {
         SettingsSection::Theme => current_theme_index(&state.theme_name),
         SettingsSection::Sound => usize::from(!state.sound_enabled()),
         SettingsSection::Toast => toast_delivery_index(state.toast_delivery()),
-        SettingsSection::PaneLabels => usize::from(!state.agent_border_labels_enabled()),
+        SettingsSection::PaneLabels => {
+            if !state.agent_border_labels_enabled() {
+                1
+            } else {
+                0
+            }
+        }
         SettingsSection::Experiments => 0,
         SettingsSection::Integrations => 0,
     };
@@ -403,6 +418,8 @@ impl AppState {
                 let list_y = area.y + 3;
                 if row >= list_y && row < list_y + 2 {
                     Some((row - list_y) as usize)
+                } else if row >= list_y + 6 && row < list_y + 8 {
+                    Some((row - list_y - 6 + 2) as usize)
                 } else {
                     None
                 }
@@ -452,8 +469,12 @@ impl AppState {
                             Some(SettingsAction::SaveToastDelivery(delivery))
                         }
                         SettingsSection::PaneLabels => {
-                            let enabled = idx == 0;
-                            Some(SettingsAction::SaveAgentBorderLabels(enabled))
+                            let enabled = idx % 2 == 0;
+                            Some(if idx < 2 {
+                                SettingsAction::SaveAgentBorderLabels(enabled)
+                            } else {
+                                SettingsAction::SaveIndexNumbers(enabled)
+                            })
                         }
                         SettingsSection::Experiments => experiment_toggle_action(self, idx),
                         SettingsSection::Integrations => None,

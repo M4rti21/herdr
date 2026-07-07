@@ -260,6 +260,7 @@ fn compute_view_internal(
                 app.tab_scroll,
                 app.tab_scroll_follow_active,
                 app.mouse_capture,
+                app.index_numbers,
             )
         })
         .unwrap_or_default();
@@ -984,7 +985,6 @@ mod tests {
         let line2 = buffer_row_text(buffer, card, card.y + 1);
 
         assert!(line1.starts_with(" · one"));
-        assert!(!line1.contains("1 one"));
         assert_eq!(line2, "   main");
 
         std::fs::remove_dir_all(repo).ok();

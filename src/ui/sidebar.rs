@@ -847,6 +847,16 @@ fn render_workspace_list(
     let scrollbar_rect = workspace_list_scrollbar_rect(app, area);
     let cards = &app.view.workspace_card_areas;
 
+    let ws_position: std::collections::HashMap<usize, usize> = if app.index_numbers {
+        app.visible_workspace_order()
+            .into_iter()
+            .enumerate()
+            .map(|(pos, ws_idx)| (ws_idx, pos))
+            .collect()
+    } else {
+        std::collections::HashMap::new()
+    };
+
     for card in cards {
         let i = card.ws_idx;
         let ws = &app.workspaces[i];
@@ -906,6 +916,19 @@ fn render_workspace_list(
             line1.push(Span::styled(" ", Style::default()));
         } else {
             line1.push(Span::styled(" ", Style::default()));
+        }
+        if app.index_numbers {
+            let num_style = if selected {
+                Style::default().fg(p.overlay1)
+            } else if is_active {
+                Style::default().fg(p.text)
+            } else {
+                Style::default().fg(p.overlay0)
+            };
+            if let Some(pos) = ws_position.get(&i) {
+                line1.push(Span::styled(format!("{}", pos + 1), num_style));
+                line1.push(Span::styled(" ", Style::default()));
+            }
         }
         if show_workspace_icon {
             line1.push(Span::styled(icon, icon_style));

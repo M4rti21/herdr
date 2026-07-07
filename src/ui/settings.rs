@@ -139,14 +139,33 @@ pub(super) fn render_settings_overlay(app: &AppState, frame: &mut Frame, area: R
             );
         }
         SettingsSection::PaneLabels => {
+            let [top, bottom] = Layout::vertical([Constraint::Length(6), Constraint::Min(6)])
+                .areas::<2>(content_area);
             render_settings_toggle(
                 frame,
-                content_area,
+                top,
                 p,
                 "agent border labels",
                 "show detected agent names in split pane borders",
                 app.agent_border_labels_enabled(),
-                app.settings.list.selected,
+                if app.settings.list.selected < 2 {
+                    app.settings.list.selected
+                } else {
+                    2
+                },
+            );
+            render_settings_toggle(
+                frame,
+                bottom,
+                p,
+                "index numbers",
+                "show workspace and tab index for 1..9 keybinds",
+                app.index_numbers_enabled(),
+                if app.settings.list.selected >= 2 {
+                    app.settings.list.selected - 2
+                } else {
+                    2
+                },
             );
         }
         SettingsSection::Experiments => {
