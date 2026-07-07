@@ -812,6 +812,8 @@ pub struct UiConfig {
     pub tab_index_numbers: bool,
     /// Show index numbers for agents to visually match 1..9 keybinds. Default: false.
     pub agent_index_numbers: bool,
+    /// Separator character or string after the index number. Default: ")".
+    pub index_number_separator: String,
     /// Agent sidebar ordering. Saved values are "spaces" or "priority". Default: "spaces".
     pub agent_panel_sort: AgentPanelSortConfig,
     /// Accent color for highlights, borders, and navigation UI.
@@ -1008,6 +1010,7 @@ impl Default for UiConfig {
             space_index_numbers: false,
             tab_index_numbers: false,
             agent_index_numbers: false,
+            index_number_separator: ")".into(),
             agent_panel_sort: AgentPanelSortConfig::Spaces,
             accent: "cyan".into(),
             toast: ToastConfig::default(),

@@ -917,6 +917,7 @@ fn render_workspace_list(
         } else {
             line1.push(Span::styled(" ", Style::default()));
         }
+        let sep = app.index_number_separator();
         if app.space_index_numbers {
             let num_style = if selected {
                 Style::default().fg(p.overlay1)
@@ -926,7 +927,7 @@ fn render_workspace_list(
                 Style::default().fg(p.overlay0)
             };
             if let Some(pos) = ws_position.get(&i) {
-                line1.push(Span::styled(format!("{})", pos + 1), num_style));
+                line1.push(Span::styled(format!("{}{sep}", pos + 1), num_style));
                 line1.push(Span::styled(" ", Style::default()));
             }
         }
@@ -1083,6 +1084,7 @@ fn render_agent_detail(
         return;
     }
 
+    let sep = app.index_number_separator();
     let mut row_y = body.y;
     let body_bottom = body.y + body.height;
     for abs_idx in app.agent_panel_scroll..details.len() {
@@ -1130,7 +1132,7 @@ fn render_agent_detail(
             format_agent_panel_primary_label(detail, body.width.saturating_sub(3) as usize);
         let mut name_spans = vec![Span::styled(" ", Style::default())];
         if app.agent_index_numbers {
-            name_spans.push(Span::styled(format!("{})", abs_idx + 1), num_style));
+            name_spans.push(Span::styled(format!("{}{sep}", abs_idx + 1), num_style));
             name_spans.push(Span::styled(" ", Style::default()));
         }
         name_spans.push(Span::styled(icon, icon_style));

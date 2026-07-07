@@ -1397,6 +1397,7 @@ pub struct AppState {
     pub space_index_numbers: bool,
     pub tab_index_numbers: bool,
     pub agent_index_numbers: bool,
+    pub index_number_separator: String,
     pub pane_history_persistence: bool,
     /// Expose the focused pane's cursor anchor to the outer terminal even when
     /// the pane requested `?25l`. See `[experimental] reveal_hidden_cursor_for_cjk_ime`.
@@ -1495,6 +1496,10 @@ impl AppState {
 
     pub fn agent_index_numbers_enabled(&self) -> bool {
         self.agent_index_numbers
+    }
+
+    pub fn index_number_separator(&self) -> &str {
+        &self.index_number_separator
     }
 
     pub fn pane_history_persistence_enabled(&self) -> bool {
@@ -1770,6 +1775,7 @@ impl AppState {
             space_index_numbers: false,
             tab_index_numbers: false,
             agent_index_numbers: false,
+            index_number_separator: ")".into(),
             pane_history_persistence: false,
             reveal_hidden_cursor_for_cjk_ime: false,
             cjk_ime_agent_filter_configured: false,

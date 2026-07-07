@@ -612,6 +612,7 @@ impl App {
             space_index_numbers: config.ui.space_index_numbers,
             tab_index_numbers: config.ui.tab_index_numbers,
             agent_index_numbers: config.ui.agent_index_numbers,
+            index_number_separator: config.ui.index_number_separator.clone(),
             pane_history_persistence: config.experimental.pane_history,
             reveal_hidden_cursor_for_cjk_ime: config.experimental.reveal_hidden_cursor_for_cjk_ime,
             cjk_ime_agent_filter_configured: !config.experimental.cjk_ime_agents.is_empty(),
@@ -1388,6 +1389,9 @@ impl App {
                 self.state.space_index_numbers = config.ui.space_index_numbers;
                 self.state.tab_index_numbers = config.ui.tab_index_numbers;
                 self.state.agent_index_numbers = config.ui.agent_index_numbers;
+                self.state
+                    .index_number_separator
+                    .clone_from(&config.ui.index_number_separator);
                 self.state.agent_panel_sort =
                     agent_panel_sort_from_config(config.ui.agent_panel_sort);
                 self.state.agent_panel_scroll = 0;

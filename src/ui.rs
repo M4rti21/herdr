@@ -261,6 +261,7 @@ fn compute_view_internal(
                 app.tab_scroll_follow_active,
                 app.mouse_capture,
                 app.tab_index_numbers,
+                app.index_number_separator(),
             )
         })
         .unwrap_or_default();

@@ -1530,6 +1530,7 @@ impl AppState {
             self.tab_scroll_follow_active,
             self.mouse_capture,
             self.tab_index_numbers,
+            self.index_number_separator(),
         );
         self.tab_scroll = layout.scroll;
         self.view.tab_hit_areas = layout.tab_hit_areas;
